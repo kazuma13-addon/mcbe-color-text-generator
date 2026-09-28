@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCPE Generator</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --panel-bg: #2d2d2d;
+            --text-color: #ffffff;
+            --accent-color: #ffaa00;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 1.1rem;
+            text-align: center;
+            margin: 8px 0 2px 0;
+            color: var(--accent-color);
+        }
+
+        .subtitle {
+            font-size: 0.75rem;
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 12px;
+        }
+
+        .card {
+            background-color: var(--panel-bg);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        label {
+            font-size: 0.8rem;
+            display: block;
+            margin-bottom: 4px;
+            color: #ccc;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid #444;
+            background-color: #1a1a1a;
+            color: #fff;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            margin-bottom: 6px;
+            resize: none;
+            height: 75px;
+            overflow-y: auto;
+        }
+
+        /* 履歴・編集補助ボタン用の列 */
+        .history-row {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .history-row button {
+            flex: 1;
+            background-color: #383838;
+            color: #ddd;
+            border: 1px solid #555;
+            padding: 5px;
+        }
+
+        .history-row button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 5px;
+            margin-bottom: 8px;
+        }
+
+        button {
+            padding: 6px 2px;
+            border-radius: 4px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: opacity 0.2s;
+        }
+
+        button:active {
+            opacity: 0.7;
+        }
+
+        /* マイクラ風カラーのボタン定義 */
+        .btn-color { 
+            background-color: #444; 
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+        .c-black { border-left: 3px solid #000000; color: #000000; }
+        .c-dark_blue { border-left: 3px solid #0000aa; color: #5555ff; }
+        .c-dark_green { border-left: 3px solid #00aa00; color: #00aa00; }
+        .c-dark_aqua { border-left: 3px solid #00aaaa; color: #55ffff; }
+        .c-dark_red { border-left: 3px solid #aa0000; color: #aa0000; }
+        .c-dark_purple { border-left: 3px solid #aa00aa; color: #aa00aa; }
+        .c-gold { border-left: 3px solid #ffaa00; color: #ffaa00; }
+        .c-gray { border-left: 3px solid #aaaaaa; color: #aaaaaa; }
+        .c-dark_gray { border-left: 3px solid #555555; color: #555555; }
+        .c-blue { border-left: 3px solid #5555ff; color: #5555ff; }
+        .c-green { border-left: 3px solid #55ff55; color: #55ff55; }
+        .c-aqua { border-left: 3px solid #55ffff; color: #55ffff; }
+        .c-red { border-left: 3px solid #ff5555; color: #ff5555; }
+        .c-light_purple { border-left: 3px solid #ff55ff; color: #ff55ff; }
+        .c-yellow { border-left: 3px solid #ffff55; color: #ffff55; }
+        .c-white { border-left: 3px solid #ffffff; color: #ffffff; }
+
+        .btn-format {
+            background-color: #333;
+            color: #ddd;
+            border: 1px solid #555;
+        }
+
+        /* 装飾ボタンごとのリアルタイム見た目プレビュー */
+        .fmt-bold { font-weight: bold; }
+        .fmt-italic { font-style: italic; font-family: monospace; }
+        .fmt-underline { text-decoration: underline; font-family: monospace; }
+        .fmt-strike { text-decoration: line-through; font-family: monospace; }
+        .fmt-obf { opacity: 0.7; font-family: monospace; }
+        .fmt-reset { color: #ff9999; font-family: monospace; }
+        .btn-danger {
+            background-color: #772222;
+            color: #ffcccc;
+            width: 100%;
+            padding: 6px;
+            margin-top: 2px;
+            font-size: 0.8rem;
+        }
+
+        /* Wikiリンクボタン用のスタイル */
+        .btn-wiki {
+            display: block;
+            width: 100%;
+            background-color: #3a3a3a;
+            color: #ccc;
+            text-align: center;
+            padding: 7px;
+            margin-top: 6px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            box-sizing: border-box;
+            border: 1px solid #555;
+            transition: background 0.2s;
+        }
+        .btn-wiki:active {
+            opacity: 0.7;
+        }
+
+        /* プレビューエリア */
+        #preview-box {
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 1rem;
+            text-align: center;
+            min-height: 40px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            margin-bottom: 8px;
+            border: 1px solid #444;
+            background-color: #1e1e1e;
+            line-height: 1.4;
+        }
+
+        .controls-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+        }
+
+        .output-code {
+            font-family: monospace;
+            background-color: #111;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            word-break: break-all;
+            white-space: pre-wrap;
+            color: var(--accent-color);
+        }
+
+        .copy-btn {
+            background-color: var(--accent-color);
+            color: #000;
+            width: 100%;
+            padding: 8px;
+            font-size: 0.9rem;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>color text generator</h1>
+    <div class="subtitle">For bedrock</div>
+
+    <!-- 入力セクション -->
+    <div class="card">
+        <label for="text-input">Enter text (Format inserts at cursor)</label>
+        <textarea id="text-input" placeholder="Type text here...">§7Minecraft §6texture</textarea>
+
+        <!-- 戻る・進むボタン -->
+        <div class="history-row">
+            <button id="undo-btn" onclick="undo()" disabled>↩ Undo</button>
+            <button id="redo-btn" onclick="redo()" disabled>↪ Redo</button>
+        </div>
+
+        <label>Color Codes</label>
+        <div class="btn-grid">
+            <button class="btn-color c-black" onclick="insertCode('§0')">§0</button>
+            <button class="btn-color c-dark_blue" onclick="insertCode('§1')">§1</button>
+            <button class="btn-color c-dark_green" onclick="insertCode('§2')">§2</button>
+            <button class="btn-color c-dark_aqua" onclick="insertCode('§3')">§3</button>
+            <button class="btn-color c-dark_red" onclick="insertCode('§4')">§4</button>
+            <button class="btn-color c-dark_purple" onclick="insertCode('§5')">§5</button>
+            <button class="btn-color c-gold" onclick="insertCode('§6')">§6</button>
+            <button class="btn-color c-gray" onclick="insertCode('§7')">§7</button>
+            <button class="btn-color c-dark_gray" onclick="insertCode('§8')">§8</button>
+            <button class="btn-color c-blue" onclick="insertCode('§9')">§9</button>
+            <button class="btn-color c-green" onclick="insertCode('§a')">§a</button>
+            <button class="btn-color c-aqua" onclick="insertCode('§b')">§b</button>
+            <button class="btn-color c-red" onclick="insertCode('§c')">§c</button>
+            <button class="btn-color c-light_purple" onclick="insertCode('§d')">§d</button>
+            <button class="btn-color c-yellow" onclick="insertCode('§e')">§e</button>
+            <button class="btn-color c-white" onclick="insertCode('§f')">§f</button>
+        </div>
+
+        <label>Formatting</label>
+        <div class="btn-grid">
+            <button class="btn-format fmt-bold" onclick="insertCode('§l')">§l Bold</button>
+            <button class="btn-format fmt-italic" onclick="insertCode('§o')">§o Italic</button>
+            <button class="btn-format fmt-underline" onclick="insertCode('§n')">§n Under</button>
+            <button class="btn-format fmt-strike" onclick="insertCode('§m')">§m Strike</button>
+            <button class="btn-format fmt-obf" onclick="insertCode('§k')">§k Obf</button>
+            <button class="btn-format fmt-reset" onclick="insertCode('§r')">§r Reset</button>
+        </div>
+
+        <!-- リセットボタン -->
+        <button class="btn-danger" onclick="confirmReset()">Reset Input</button>
+
+        <!-- 公式Wikiへのリンクボタン -->
+        <a href="https://minecraft.wiki/w/Formatting_codes" target="_blank" class="btn-wiki">?</a>
+    </div>
+
+    <!-- プレビューセクション -->
+    <div class="card">
+        <label>Preview</label>
+        <div id="preview-box">Preview will appear here</div>
+        
+        <div class="controls-row">
+            <label style="margin:0;">Background:</label>
+            <select id="bg-selector" onchange="changeBgColor()" style="padding: 4px; border-radius: 4px; background: #1a1a1a; color: #fff; border: 1px solid #444; font-size: 0.8rem;">
+                <option value="#1e1e1e">Dark</option>
+                <option value="#333333">Gray</option>
+                <option value="#000000">Black</option>
+                <option value="#ffffff; color: #000;">White</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- 出力・コピーセクション -->
+    <div class="card">
+        <label>Output Code (for manifest.json etc.)</label>
+        <div class="output-code" id="output-code"></div>
+        <button class="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+    </div>
+</div>
+
+<script>
+    const input = document.getElementById('text-input');
+    const previewBox = document.getElementById('preview-box');
+    const outputCode = document.getElementById('output-code');
+    const bgSelector = document.getElementById('bg-selector');
+    const undoBtn = document.getElementById('undo-btn');
+    const redoBtn = document.getElementById('redo-btn');
+
+    let history = [input.value];
+    let historyIndex = 0;
+    let isInternalChange = false;
+
+    function pushHistory(val) {
+        if (isInternalChange) return;
+        history = history.slice(0, historyIndex + 1);
+        if (history[history.length - 1] !== val) {
+            history.push(val);
+            historyIndex = history.length - 1;
+            updateHistoryButtons();
+        }
+    }
+
+    function updateHistoryButtons() {
+        undoBtn.disabled = historyIndex <= 0;
+        redoBtn.disabled = historyIndex >= history.length - 1;
+    }
+
+    function undo() {
+        if (historyIndex > 0) {
+            historyIndex--;
+            applyHistoryState();
+        }
+    }
+
+    function redo() {
+        if (historyIndex < history.length - 1) {
+            historyIndex++;
+            applyHistoryState();
+        }
+    }
+
+    function applyHistoryState() {
+        isInternalChange = true;
+        input.value = history[historyIndex];
+        isInternalChange = false;
+        updateDisplay();
+        updateHistoryButtons();
+    }
+
+    function insertCode(code) {
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+        const text = input.value;
+        const newVal = text.substring(0, start) + code + text.substring(end);
+        
+        input.value = newVal;
+        input.focus();
+        input.setSelectionRange(start + code.length, start + code.length);
+        
+        pushHistory(newVal);
+        updateDisplay();
+    }
+
+    function confirmReset() {
+        if (input.value === "") return;
+        const ok = confirm("Are you sure you want to reset all input?");
+        if (ok) {
+            input.value = "";
+            pushHistory("");
+            updateDisplay();
+            input.focus();
+        }
+    }
+
+    function updateDisplay() {
+        const val = input.value;
+        
+        const codeVal = val.replace(/\r\n|\n|\r/g, '\\n');
+        outputCode.textContent = codeVal;
+        
+        const regex = /§([0-9a-fk-or])/gi;
+        let lastIndex = 0;
+        let match;
+
+        let currentColor = '#ffffff';
+        let isBold = false;
+        let isItalic = false;
+        let isUnderline = false;
+        let isStrike = false;
+        let isObfuscated = false;
+
+        const colorMap = {
+            '0': '#000000', '1': '#0000aa', '2': '#00aa00', '3': '#00aaaa',
+            '4': '#aa0000', '5': '#aa00aa', '6': '#ffaa00', '7': '#aaaaaa',
+            '8': '#555555', '9': '#5555ff', 'a': '#55ff55', 'b': '#55ffff',
+            'c': '#ff5555', 'd': '#ff55ff', 'e': '#ffff55', 'f': '#ffffff'
+        };
+
+        previewBox.innerHTML = '';
+
+        while ((match = regex.exec(val)) !== null) {
+            if (match.index > lastIndex) {
+                let chunk = val.substring(lastIndex, match.index);
+                appendSpan(chunk);
+            }
+
+            let code = match[1].toLowerCase();
+            if (colorMap[code]) {
+                currentColor = colorMap[code];
+            } else if (code === 'l') { isBold = true; }
+              else if (code === 'o') { isItalic = true; }
+              else if (code === 'n') { isUnderline = true; }
+              else if (code === 'm') { isStrike = true; }
+              else if (code === 'k') { isObfuscated = true; }
+              else if (code === 'r') {
+                  currentColor = '#ffffff';
+                  isBold = false;
+                  isItalic = false;
+                  isUnderline = false;
+                  isStrike = false;
+                  isObfuscated = false;
+              }
+
+            lastIndex = regex.lastIndex;
+        }
+
+        if (lastIndex < val.length) {
+            let chunk = val.substring(lastIndex);
+            appendSpan(chunk);
+        }
+
+        function appendSpan(text) {
+            if (!text) return;
+            let span = document.createElement('span');
+            span.style.color = currentColor;
+            if (isBold) span.style.fontWeight = 'bold';
+            if (isItalic) span.style.fontStyle = 'italic';
+            
+            let decorations = [];
+            if (isUnderline) decorations.push('underline');
+            if (isStrike) decorations.push('line-through');
+            if (decorations.length > 0) {
+                span.style.textDecoration = decorations.join(' ');
+            }
+            if (isObfuscated) {
+                span.style.opacity = '0.6';
+                span.style.fontFamily = 'monospace';
+            }
+
+            span.textContent = text;
+            previewBox.appendChild(span);
+        }
+    }
+
+    function changeBgColor() {
+        const val = bgSelector.value;
+        if (val.includes(';')) {
+            const parts = val.split(';');
+            previewBox.style.backgroundColor = parts[0];
+            previewBox.style.color = 'black';
+        } else {
+            previewBox.style.backgroundColor = val;
+            previewBox.style.color = '';
+        }
+    }
+
+    input.addEventListener('input', () => {
+        pushHistory(input.value);
+        updateDisplay();
+    });
+    
+    updateDisplay();
+
+    function copyToClipboard() {
+        const text = outputCode.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Copied to clipboard!');
+        }).catch(err => {
+            alert('Failed to copy');
+        });
+    }
+</script>
+
+</body>
+</html>
